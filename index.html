@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>街道空間配比互動模擬器</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #0f172a; color: #f8fafc; max-width: 720px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+  h1 { color: #38bdf8; margin-bottom: 5px; }
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 18px; margin-top: 16px; }
+  .guide { border-left: 4px solid #38bdf8; background: #172554; }
+  label { display: flex; justify-content: space-between; margin: 12px 0 4px; font-weight: bold; }
+  input[type=range] { width: 100%; accent-color: #38bdf8; }
+  .bar { display: flex; height: 60px; border-radius: 8px; overflow: hidden; margin-top: 15px; font-size: 13px; font-weight: bold; }
+  .seg { display: flex; align-items: center; justify-content: center; transition: 0.2s; color: #fff; }
+  .score { font-size: 28px; color: #34d399; font-weight: bold; }
+</style>
+</head>
+<body>
+  <h1>🏙️ 街道空間配比互動模擬器</h1>
+  <p>自訂道路斷面配置與步行友善度試算工具</p>
+
+  <div class="card guide">
+    <h3>📖 網站使用說明</h3>
+    <ol style="padding-left: 20px; margin: 8px 0 0;">
+      <li><strong>拉動滑桿</strong>：調整下方「人行道寬度」與「綠植帶寬度」數值。</li>
+      <li><strong>即時預覽</strong>：觀察色塊比例尺如何動態分配 12 公尺標準路幅。</li>
+      <li><strong>查看評分</strong>：系統將根據人本交通比例自動算出步行友善分數與降溫效益。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <label><span>人行道寬度 (公尺)</span><span id="sw-val">3.0 m</span></label>
+    <input type="range" id="sw" min="1" max="5" step="0.5" value="3">
+
+    <label><span>綠植與設施帶 (公尺)</span><span id="tr-val">1.5 m</span></label>
+    <input type="range" id="tr" min="0" max="3" step="0.5" value="1.5">
+
+    <div class="bar">
+      <div id="b-sw" class="seg" style="background:#0284c7; width:25%;">人行道</div>
+      <div id="b-tr" class="seg" style="background:#16a34a; width:12.5%;">綠帶</div>
+      <div id="b-car" class="seg" style="background:#475569; width:62.5%;">車行道</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div>步行友善度綜合評分：<span class="score" id="score">86 分</span></div>
+    <div id="desc" style="color:#94a3b8; margin-top:4px;">預估微氣候體感降溫：-1.6 °C | 等級：優良人本街道</div>
+  </div>
+
+  <script>
+    const sw = document.getElementById('sw'), tr = document.getElementById('tr');
+    function render() {
+      const s = parseFloat(sw.value), t = parseFloat(tr.value), c = 12 - s - t;
+      document.getElementById('sw-val').innerText = s.toFixed(1) + ' m';
+      document.getElementById('tr-val').innerText = t.toFixed(1) + ' m';
+      document.getElementById('b-sw').style.width = (s/12*100) + '%';
+      document.getElementById('b-tr').style.width = (t/12*100) + '%';
+      document.getElementById('b-car').style.width = (c/12*100) + '%';
+      const pts = Math.min(100, Math.round(45 + s * 10 + t * 8));
+      document.getElementById('score').innerText = pts + ' 分';
+      document.getElementById('desc').innerText = `預估微氣候體感降溫：-${(t*0.8+s*0.15).toFixed(1)} °C | 車道剩餘：${c.toFixed(1)} m`;
+    }
+    sw.oninput = render; tr.oninput = render;
+  </script>
+</body>
+</html>
